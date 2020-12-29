@@ -14,5 +14,7 @@ RUN chmod 755 /entrypoint.sh \
 
 ENV GIT_COMMITTER_NAME="Cloud Posse"
 ENV GIT_COMMITTER_EMAIL="hello@cloudposse.com"
+ENV GIT_AUTHOR_NAME="Cloud Posse"
+ENV GIT_AUTHOR_EMAIL="hello@cloudposse.com"
 
 ENTRYPOINT ["/entrypoint.sh"]
