@@ -11,8 +11,9 @@ git clone --branch ${INPUT_VERSION} ${INPUT_REPO} ../actions
 
 for workflow in $(tr , ' ' <<<${INPUT_WORKFLOWS}); do 
   # Install the workflow
-  ls -l
-  ls -l ../
+  pwd
+  ls -l ..
+  ls -l ../actions
   cp -a ../actions/${INPUT_CATALOG}/${workflow}.yaml .github/workflows/
 done
 
