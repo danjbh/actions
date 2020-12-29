@@ -1,4 +1,4 @@
-FROM alpine:latest
+FROM alpine:3.12
 
 LABEL maintainer="Cloud Posse <hello@cloudposse.com>"
 
