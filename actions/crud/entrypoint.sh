@@ -19,4 +19,5 @@ done
 
 git add .github/workflows/
 git commit -m "Auto updating Gitflow CRUD workflows to master branch"
+git fetch origin ${GITHUB_REF##*/}
 git push origin ${GITHUB_REF##*/}
