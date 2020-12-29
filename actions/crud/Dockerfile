@@ -12,7 +12,7 @@ COPY entrypoint.sh /
 RUN chmod 755 /entrypoint.sh \
   && apk --no-cache add bash git
 
-ENV GIT_COMMITTER_NAME=Cloud Posse
-ENV GIT_COMMITTER_EMAIL=hello@cloudposse.com
+ENV GIT_COMMITTER_NAME="Cloud Posse"
+ENV GIT_COMMITTER_EMAIL="hello@cloudposse.com"
 
 ENTRYPOINT ["/entrypoint.sh"]
