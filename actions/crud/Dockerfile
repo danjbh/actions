@@ -10,6 +10,6 @@ LABEL "com.github.actions.color"="blue"
 COPY entrypoint.sh /
 
 RUN chmod 755 /entrypoint.sh \
-  && apk --no-cache add bash
+  && apk --no-cache add bash git
 
 ENTRYPOINT ["/entrypoint.sh"]
