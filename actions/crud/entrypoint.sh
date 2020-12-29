@@ -12,5 +12,5 @@ cd actions # This needs to change... obviously.
 
 for workflow in $(tr , ' ' <<<${WORKFLOWS}); do 
   # Install the workflow
-  cp -a ${CATALOG}/${spec}.yaml .github/workflows/
+  cp -a ${CATALOG}/${workflow}.yaml .github/workflows/
 fi
