@@ -1,0 +1,35 @@
+name: deploy
+on:
+  workflow_run:
+    workflows:
+    - build
+    branches:
+    - master
+    types:
+    - completed
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    container:
+      image: possedan/example-app:${{ github.sha }}
+    steps:
+    - name: "Checkout source code"
+      uses: actions/checkout@v2
+    - name: "Prep kubeconfig"
+      run: |
+        mkdir ~/.kube
+        echo -n ${{ secrets.KUBECONFIG }} | base64 -d > ~/.kube/config
+    - name: "Deploy with helmfile"
+      env:
+        RELEASE_NAME: example-app
+        NAMESPACE: master
+        IMAGE_NAME: possedan/example-app
+        IMAGE_TAG: ${{ github.sha }}
+        APP_SCHEME: http
+        APP_HOST: master.example.cloudposse.org
+        COLOR: blue
+      run: |
+        echo 'Preparing to deploy possedan/example-app:${{ github.sha }}'
+        apk add --update curl make bash git kubectl@cloudposse helm@cloudposse=3.1.3-r0 helmfile@cloudposse
+        cd deploy
+        helmfile --namespace master --selector preview=true sync

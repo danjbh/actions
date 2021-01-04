@@ -1,0 +1,82 @@
+name: preview
+env:
+  IMAGE_NAME: possedan/example-app
+  IMAGE_TAG: ${{ github.sha }}
+on:
+  workflow_dispatch: 
+  # push:
+  #   branches:
+  #   - master
+  #   paths-ignore:
+  #   - '.github/workflows/crud.yaml'
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: "Checkout source code"
+      uses: actions/checkout@v2
+    - name: Run Docker Compose
+      #if: env.INTEGRATION_TESTS_ENABLED == 'true'
+      run: cd .github/workflows/compose && docker-compose up
+  build:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+    - name: "Checkout source code"
+      uses: actions/checkout@v2
+    - name: Set up Docker buildx
+      uses: docker/setup-buildx-action@v1
+    - name: Login to DockerHub
+      uses: docker/login-action@v1 
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_PASSWORD }}
+    - name: "build and push docker image"
+      uses: docker/build-push-action@v2
+      with:
+        tags: ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+        push: true
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    container:
+      image: possedan/example-app:${{ github.sha }}
+    steps:
+    - name: "Checkout source code"
+      uses: actions/checkout@v2
+    - name: "Prep kubeconfig"
+      run: |
+        mkdir ~/.kube
+        echo -n ${{ secrets.KUBECONFIG }} | base64 -d > ~/.kube/config
+    - name: "Deploy with helmfile"
+      env:
+        RELEASE_NAME: example-app
+        NAMESPACE: master
+        APP_SCHEME: http
+        APP_HOST: master.example.cloudposse.org
+        COLOR: blue
+      run: |
+        echo 'Preparing to deploy possedan/example-app:${{ github.sha }}'
+        apk add --update curl make bash git kubectl@cloudposse helm@cloudposse=3.1.3-r0 helmfile@cloudposse
+        cd deploy
+        helmfile --namespace master --selector preview=true sync
+
+    # Example slack notifications
+    # - name: Notify slack success
+    #   if: success()
+    #   env:
+    #     SLACK_BOT_TOKEN: ${{ secrets.SLACK_TOKEN }}
+    #   uses: voxmedia/github-action-slack-notify-build@v1
+    #   with:
+    #     channel: _some_channel
+    #     status: SUCCESS
+    #     color: good
+    # - name: Notify slack fail
+    #   if: failure()
+    #   env:
+    #     SLACK_BOT_TOKEN: ${{ secrets.SLACK_TOKEN }}
+    #   uses: voxmedia/github-action-slack-notify-build@v1
+    #   with:
+    #     channel: _some_channel
+    #     status: FAILED
+    #     color: danger

@@ -1,30 +1,28 @@
-name: build
+name: destroy
 on:
   workflow_dispatch: 
-  # push:
-  #   branches:
-  #   - master
-  #   paths-ignore:
-  #   - '.github/workflows/crud.yaml'
 jobs:
-  build:
+  destroy:
     runs-on: ubuntu-latest
+    container:
+      image: possedan/example-app:${{ github.sha }}
     steps:
     - name: "Checkout source code"
       uses: actions/checkout@v2
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v1
-    - name: Login to DockerHub
-      uses: docker/login-action@v1 
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_PASSWORD }}
-    - name: "Build and push docker image"
-      uses: docker/build-push-action@v2
-      with:
-        tags: possedan/example-app:${{ github.sha }}
-        push: true
-        #build-args:
+    - name: "Prep kubeconfig"
+      run: |
+        mkdir ~/.kube
+        echo -n ${{ secrets.KUBECONFIG }} | base64 -d > ~/.kube/config
+    - name: "destroy with helmfile"
+      env:
+        RELEASE_NAME: example-app
+        NAMESPACE: master
+        COLOR: blue
+      run: |
+        echo 'Preparing to destroy possedan/example-app:${{ github.sha }}'
+        apk add --update curl make bash git kubectl@cloudposse helm@cloudposse=3.1.3-r0 helmfile@cloudposse
+        cd deploy
+        helmfile --namespace master --selector preview=true destroy
 
     # Example slack notifications
     # - name: Notify slack success
