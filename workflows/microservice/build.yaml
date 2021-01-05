@@ -30,4 +30,4 @@ jobs:
       with:
         token: ${{ secrets.WORKFLOWS_TOKEN }}
         event-type: deploy
-        client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "stage": ""}'
+        client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "stage": "master"}'
