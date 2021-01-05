@@ -28,5 +28,6 @@ jobs:
       uses: cloudposse/actions/github/repository-dispatch@0.22.0
       if: github.ref == 'refs/heads/master'
       with:
+        token: ${{ secrets.WORKFLOWS_TOKEN }}
         event-type: deploy
         client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "stage": ""}'
