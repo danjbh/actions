@@ -33,3 +33,18 @@ jobs:
         apk add --update curl make bash git kubectl@cloudposse helm@cloudposse=3.1.3-r0 helmfile@cloudposse
         cd deploy
         helmfile --namespace master --selector preview=true sync
+  # github-status-update:
+  #   runs-on: ubuntu-latest
+  #   container:
+  #     image: cloudposse/github-status-updater
+  #   steps:
+  #   - name: "Update Github Deployment Status"
+  #     env:
+  #       GITHUB_ACTION: update_state
+  #       GITHUB_OWNER: ${{CF_REPO_OWNER}}
+  #       GITHUB_REPO: ${{CF_REPO_NAME}}
+  #       GITHUB_REF: ${{CF_REVISION}}
+  #       GITHUB_CONTEXT: ${{STAGE}}/env
+  #       GITHUB_STATE: success
+  #       GITHUB_DESCRIPTION: Deployed to ${{NAMESPACE}} by @${{CF_BUILD_INITIATOR}}
+  #       GITHUB_TARGET_URL: ${{APP_SCHEME}}://${{APP_HOST}}/dashboard
